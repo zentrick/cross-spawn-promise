@@ -1,6 +1,6 @@
 {
   "name": "cross-spawn-promise",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Promisified cross-spawn-async.",
   "main": "index.js",
   "author": "Zentrick nv (https://www.zentrick.com/)",
