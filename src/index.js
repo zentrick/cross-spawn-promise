@@ -2,23 +2,42 @@
 
 import crossSpawn from 'cross-spawn-async'
 
-export default (cmd, args, opt) => new Promise((resolve, reject) => {
-  const proc = crossSpawn(cmd, args, opt)
-  const stdout = []
-  const stderr = []
-  proc.stdout.on('data', (data) => {
-    stdout.push(data)
-  })
-  proc.stderr.on('data', (data) => {
-    stderr.push(data)
-  })
+const parseStdioOption = (value) => {
+  let ignoreStdout = false
+  let ignoreStderr = false
+  if (value === 'ignore') {
+    ignoreStdout = true
+    ignoreStderr = true
+  } else if (Array.isArray(value)) {
+    ignoreStdout = (value[1] === 'ignore')
+    ignoreStderr = (value[1] === 'ignore')
+  }
+  return [ignoreStdout, ignoreStderr]
+}
+
+export default (cmd, args, options = {}) => new Promise((resolve, reject) => {
+  const proc = crossSpawn(cmd, args, options)
+  let stdout = null
+  let stderr = null
+  const [ignoreStdout, ignoreStderr] = parseStdioOption(options.stdio)
+  if (!ignoreStdout) {
+    stdout = []
+    proc.stdout.on('data', (data) => { stdout.push(data) })
+  }
+  if (!ignoreStderr) {
+    stderr = []
+    proc.stderr.on('data', (data) => { stderr.push(data) })
+  }
   proc.once('close', (code) => {
     if (code !== 0) {
       const err = new Error(`Exited with status ${code}`)
-      err.stderr = Buffer.concat(stderr)
+      err.exitStatus = code
+      if (!ignoreStderr) {
+        err.stderr = Buffer.concat(stderr)
+      }
       reject(err)
     } else {
-      resolve(Buffer.concat(stdout))
+      resolve(ignoreStdout ? null : Buffer.concat(stdout))
     }
   })
 })
