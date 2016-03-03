@@ -22,9 +22,7 @@
     "test": "gulp test"
   },
   "repository": "zentrick/cross-spawn-promise",
-  "bugs": {
-    "url": "https://github.com/zentrick/cross-spawn-promise/issues"
-  },
+  "bugs": "https://github.com/zentrick/cross-spawn-promise/issues",
   "dependencies": {
     "cross-spawn-async": "^2.1.9"
   },
