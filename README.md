@@ -4,6 +4,26 @@
 
 Promisified [cross-spawn-async](https://www.npmjs.com/package/cross-spawn-async).
 
+## Usage
+
+```js
+import spawn from 'cross-spawn-promise'
+
+const command = 'ls'
+const args = ['ls', '/etc']
+const options = {}
+spawn(command, args, options)
+  .then((stdout) => {
+    console.info('Success!')
+    console.info('stdout:', stdout.toString())
+  })
+  .catch((error) => {
+    console.error('Failed!')
+    console.error('exit status:', error.exitStatus)
+    console.error('stderr:', error.stderr.toString())
+  })
+```
+
 ## Maintainer
 
 - [Tim De Pauw](https://github.com/timdp)
