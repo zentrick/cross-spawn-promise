@@ -27,7 +27,7 @@
     "cross-spawn-async": "^2.1.9"
   },
   "devDependencies": {
-    "babel-eslint": "^5.0.0",
+    "babel-eslint": "^6.0.0",
     "babel-preset-es2015": "^6.5.0",
     "babel-register": "^6.5.2",
     "chai": "^3.5.0",
