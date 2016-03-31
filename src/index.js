@@ -42,4 +42,5 @@ export default (cmd, args, options = {}) => new Promise((resolve, reject) => {
       resolve(ignoreStdout ? null : Buffer.concat(stdout))
     }
   })
+  proc.once('error', reject)
 })
