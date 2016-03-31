@@ -2,15 +2,17 @@
 
 import crossSpawn from 'cross-spawn-async'
 
+const shouldIgnore = (value) => (value === 'ignore' || value === 'inherit')
+
 const parseStdioOption = (value) => {
   let ignoreStdout = false
   let ignoreStderr = false
-  if (value === 'ignore') {
+  if (shouldIgnore(value)) {
     ignoreStdout = true
     ignoreStderr = true
   } else if (Array.isArray(value)) {
-    ignoreStdout = (value[1] === 'ignore')
-    ignoreStderr = (value[1] === 'ignore')
+    ignoreStdout = shouldIgnore(value[1])
+    ignoreStderr = shouldIgnore(value[2])
   }
   return [ignoreStdout, ignoreStderr]
 }
