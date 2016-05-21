@@ -10,7 +10,7 @@ Promisified [cross-spawn](https://www.npmjs.com/package/cross-spawn).
 import spawn from 'cross-spawn-promise'
 
 const command = 'ls'
-const args = ['ls', '/etc']
+const args = ['-al', '/etc']
 const options = {}
 spawn(command, args, options)
   .then((stdout) => {
