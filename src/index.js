@@ -1,6 +1,6 @@
 'use strict'
 
-import crossSpawn from 'cross-spawn-async'
+import crossSpawn from 'cross-spawn'
 
 const shouldIgnore = (value) => (value === 'ignore' || value === 'inherit')
 
