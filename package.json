@@ -18,7 +18,7 @@
   "scripts": {
     "clean": "gulp clean",
     "build": "gulp build",
-    "prepublish": "npm run clean && npm run build",
+    "prepublish": "in-publish && npm run build || not-in-publish",
     "test": "gulp test"
   },
   "repository": "zentrick/cross-spawn-promise",
@@ -38,14 +38,14 @@
     "gulp-coveralls": "^0.1.4",
     "gulp-if": "^2.0.1",
     "gulp-istanbul": "^1.0.0",
-    "gulp-load-plugins": "^1.2.0",
+    "gulp-load-plugins": "^1.2.4",
     "gulp-mocha": "^2.2.0",
     "gulp-notify": "^2.2.0",
     "gulp-plumber": "^1.1.0",
     "gulp-sourcemaps": "^1.6.0",
     "gulp-standard": "^7.0.1",
     "isparta": "^4.0.0",
-    "run-sequence": "^1.1.5"
+    "run-sequence": "^1.2.1"
   },
   "standard": {
     "parser": "babel-eslint"
