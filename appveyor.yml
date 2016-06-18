@@ -17,6 +17,7 @@ test_script:
 cache:
   - node_modules -> package.json
   - "%APPDATA%\\npm-cache"
+skip_tags: true
 matrix:
   fast_finish: true
 notifications:
