@@ -32,7 +32,7 @@
     "babel-register": "^6.5.2",
     "chai": "^3.5.0",
     "chai-as-promised": "^5.2.0",
-    "del": "^2.2.0",
+    "del": "^2.2.2",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
     "gulp-coveralls": "^0.1.4",
