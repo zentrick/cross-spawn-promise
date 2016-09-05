@@ -34,6 +34,9 @@ export default (cmd, args, options = {}) => new Promise((resolve, reject) => {
     if (code !== 0) {
       const err = new Error(`Exited with status ${code}`)
       err.exitStatus = code
+      if (!ignoreStdout) {
+        err.stdout = Buffer.concat(stdout)
+      }
       if (!ignoreStderr) {
         err.stderr = Buffer.concat(stderr)
       }
