@@ -17,6 +17,20 @@ const parseStdioOption = (value) => {
   return [ignoreStdout, ignoreStderr]
 }
 
+const closeArgsToError = (code, signal) => {
+  if (signal !== null) {
+    const err = new Error(`Exited with signal ${signal}`)
+    err.exitSignal = signal
+    return err
+  }
+  if (code !== 0) {
+    const err = new Error(`Exited with status ${code}`)
+    err.exitStatus = code
+    return err
+  }
+  return null
+}
+
 export default (cmd, args, options = {}) => new Promise((resolve, reject) => {
   const proc = crossSpawn(cmd, args, options)
   let stdout = null
@@ -24,23 +38,26 @@ export default (cmd, args, options = {}) => new Promise((resolve, reject) => {
   const [ignoreStdout, ignoreStderr] = parseStdioOption(options.stdio)
   if (!ignoreStdout) {
     stdout = []
-    proc.stdout.on('data', (data) => { stdout.push(data) })
+    proc.stdout.on('data', (data) => {
+      stdout.push(data)
+    })
   }
   if (!ignoreStderr) {
     stderr = []
-    proc.stderr.on('data', (data) => { stderr.push(data) })
+    proc.stderr.on('data', (data) => {
+      stderr.push(data)
+    })
   }
-  proc.once('close', (code) => {
-    if (code !== 0) {
-      const err = new Error(`Exited with status ${code}`)
-      err.exitStatus = code
+  proc.once('exit', (code, signal) => {
+    const error = closeArgsToError(code, signal)
+    if (error !== null) {
       if (!ignoreStdout) {
-        err.stdout = Buffer.concat(stdout)
+        error.stdout = Buffer.concat(stdout)
       }
       if (!ignoreStderr) {
-        err.stderr = Buffer.concat(stderr)
+        error.stderr = Buffer.concat(stderr)
       }
-      reject(err)
+      reject(error)
     } else {
       resolve(ignoreStdout ? null : Buffer.concat(stdout))
     }
