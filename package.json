@@ -24,7 +24,7 @@
   "repository": "zentrick/cross-spawn-promise",
   "bugs": "https://github.com/zentrick/cross-spawn-promise/issues",
   "dependencies": {
-    "cross-spawn": "^4.0.0"
+    "cross-spawn": "^5.0.1"
   },
   "devDependencies": {
     "babel-eslint": "^7.1.1",
