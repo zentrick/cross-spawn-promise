@@ -31,6 +31,18 @@ const closeArgsToError = (code, signal) => {
   return null
 }
 
+const concatBuffer = (buffer) => {
+  if (buffer.length === 0) {
+    return null
+  } else if (typeof buffer[0] === 'string') {
+    return buffer.join('')
+  } else if (Buffer.isBuffer(buffer[0])) {
+    return Buffer.concat(buffer)
+  } else {
+    throw new Error('Unexpected buffer type')
+  }
+}
+
 export default (cmd, args, options = {}) => {
   let childProcess
   const promise = new Promise((resolve, reject) => {
@@ -55,14 +67,14 @@ export default (cmd, args, options = {}) => {
       const error = closeArgsToError(code, signal)
       if (error !== null) {
         if (!ignoreStdout) {
-          error.stdout = Buffer.concat(stdout)
+          error.stdout = concatBuffer(stdout)
         }
         if (!ignoreStderr) {
-          error.stderr = Buffer.concat(stderr)
+          error.stderr = concatBuffer(stderr)
         }
         reject(error)
       } else {
-        resolve(ignoreStdout ? null : Buffer.concat(stdout))
+        resolve(ignoreStdout ? null : concatBuffer(stdout))
       }
     })
     childProcess.once('error', reject)
