@@ -31,6 +31,14 @@ const closeArgsToError = (code, signal) => {
   return null
 }
 
+const concatBuffer = (buffer, encoding) => {
+  let result = Buffer.concat(buffer)
+  if (encoding === 'utf8') {
+    result = result.toString('utf8')
+  }
+  return result
+}
+
 export default (cmd, args, options = {}) => new Promise((resolve, reject) => {
   const proc = crossSpawn(cmd, args, options)
   let stdout = null
@@ -52,14 +60,14 @@ export default (cmd, args, options = {}) => new Promise((resolve, reject) => {
     const error = closeArgsToError(code, signal)
     if (error !== null) {
       if (!ignoreStdout) {
-        error.stdout = Buffer.concat(stdout)
+        error.stdout = concatBuffer(stdout, options.encoding)
       }
       if (!ignoreStderr) {
-        error.stderr = Buffer.concat(stderr)
+        error.stderr = concatBuffer(stderr, options.encoding)
       }
       reject(error)
     } else {
-      resolve(ignoreStdout ? null : Buffer.concat(stdout))
+      resolve(ignoreStdout ? null : concatBuffer(stdout, options.encoding))
     }
   })
   proc.once('error', reject)
