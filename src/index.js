@@ -31,36 +31,42 @@ const closeArgsToError = (code, signal) => {
   return null
 }
 
-export default (cmd, args, options = {}) => new Promise((resolve, reject) => {
-  const proc = crossSpawn(cmd, args, options)
-  let stdout = null
-  let stderr = null
-  const [ignoreStdout, ignoreStderr] = parseStdioOption(options.stdio)
-  if (!ignoreStdout) {
-    stdout = []
-    proc.stdout.on('data', (data) => {
-      stdout.push(data)
-    })
-  }
-  if (!ignoreStderr) {
-    stderr = []
-    proc.stderr.on('data', (data) => {
-      stderr.push(data)
-    })
-  }
-  proc.once('exit', (code, signal) => {
-    const error = closeArgsToError(code, signal)
-    if (error !== null) {
-      if (!ignoreStdout) {
-        error.stdout = Buffer.concat(stdout)
-      }
-      if (!ignoreStderr) {
-        error.stderr = Buffer.concat(stderr)
-      }
-      reject(error)
-    } else {
-      resolve(ignoreStdout ? null : Buffer.concat(stdout))
+export default (cmd, args, options = {}) => {
+  let childProcess
+  const promise = new Promise((resolve, reject) => {
+    childProcess = crossSpawn(cmd, args, options)
+
+    let stdout = null
+    let stderr = null
+    const [ignoreStdout, ignoreStderr] = parseStdioOption(options.stdio)
+    if (!ignoreStdout) {
+      stdout = []
+      childProcess.stdout.on('data', (data) => {
+        stdout.push(data)
+      })
     }
+    if (!ignoreStderr) {
+      stderr = []
+      childProcess.stderr.on('data', (data) => {
+        stderr.push(data)
+      })
+    }
+    childProcess.once('exit', (code, signal) => {
+      const error = closeArgsToError(code, signal)
+      if (error !== null) {
+        if (!ignoreStdout) {
+          error.stdout = Buffer.concat(stdout)
+        }
+        if (!ignoreStderr) {
+          error.stderr = Buffer.concat(stderr)
+        }
+        reject(error)
+      } else {
+        resolve(ignoreStdout ? null : Buffer.concat(stdout))
+      }
+    })
+    childProcess.once('error', reject)
   })
-  proc.once('error', reject)
-})
+  promise.childProcess = childProcess
+  return promise
+}
