@@ -2,21 +2,6 @@
 
 import crossSpawn from 'cross-spawn'
 
-const shouldIgnore = (value) => (value === 'ignore' || value === 'inherit')
-
-const parseStdioOption = (value) => {
-  let ignoreStdout = false
-  let ignoreStderr = false
-  if (shouldIgnore(value)) {
-    ignoreStdout = true
-    ignoreStderr = true
-  } else if (Array.isArray(value)) {
-    ignoreStdout = shouldIgnore(value[1])
-    ignoreStderr = shouldIgnore(value[2])
-  }
-  return [ignoreStdout, ignoreStderr]
-}
-
 const closeArgsToError = (code, signal) => {
   if (signal !== null) {
     const err = new Error(`Exited with signal ${signal}`)
@@ -40,34 +25,42 @@ const concatBuffer = (buffer, encoding) => {
 }
 
 export default (cmd, args, options = {}) => new Promise((resolve, reject) => {
+  // Override stdio options for capturing from even 'inherit' or 'ignore'
+  const origStdioOptions = options.stdio
+  options.stdio = 'pipe'
+
+  let stdout = []
+  let stderr = []
+
   const proc = crossSpawn(cmd, args, options)
-  let stdout = null
-  let stderr = null
-  const [ignoreStdout, ignoreStderr] = parseStdioOption(options.stdio)
-  if (!ignoreStdout) {
-    stdout = []
-    proc.stdout.on('data', (data) => {
-      stdout.push(data)
-    })
-  }
-  if (!ignoreStderr) {
-    stderr = []
-    proc.stderr.on('data', (data) => {
-      stderr.push(data)
-    })
-  }
+
+  proc.stdout.on('data', (data) => {
+    stdout.push(data)
+  })
+
+  proc.stderr.on('data', (data) => {
+    stderr.push(data)
+  })
+
+  // Reattach stdio as parent intended
+  ;['stdin', 'stdout', 'stderr'].forEach((std, i, stds) => {
+    if (!origStdioOptions) { return }
+    const origStd = origStdioOptions instanceof Array && origStdioOptions[i] || origStdioOptions
+    if (typeof origStd === 'number') {
+      proc[std].pipe(process[stds[origStd]])
+    } else if (origStd === 'inherit') {
+      proc[std].pipe(process[std])
+    }
+  })
+
   proc.once('exit', (code, signal) => {
     const error = closeArgsToError(code, signal)
     if (error !== null) {
-      if (!ignoreStdout) {
-        error.stdout = concatBuffer(stdout, options.encoding)
-      }
-      if (!ignoreStderr) {
-        error.stderr = concatBuffer(stderr, options.encoding)
-      }
+      error.stdout = concatBuffer(stdout, options.encoding)
+      error.stderr = concatBuffer(stderr, options.encoding)
       reject(error)
     } else {
-      resolve(ignoreStdout ? null : concatBuffer(stdout, options.encoding))
+      resolve(concatBuffer(stdout, options.encoding))
     }
   })
   proc.once('error', reject)
