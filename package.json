@@ -8,7 +8,7 @@
     "Tim De Pauw <tim.depauw@zentrick.com>"
   ],
   "engines": {
-    "node": ">=0.12.0"
+    "node": ">=4"
   },
   "license": "MIT",
   "files": [
