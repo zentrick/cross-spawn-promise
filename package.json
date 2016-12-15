@@ -40,12 +40,12 @@
     "gulp-load-plugins": "^1.4.0",
     "gulp-mocha": "^3.0.1",
     "gulp-sourcemaps": "^1.9.1",
-    "gulp-standard": "^8.0.2",
+    "gulp-standard": "^8.0.3",
     "in-publish": "^2.0.0",
     "isparta": "^4.0.0",
     "mocha-junit-reporter": "^1.12.1",
     "run-sequence": "^1.2.2",
-    "standard": "^8.5.0",
-    "yargs": "^6.4.0"
+    "standard": "^8.6.0",
+    "yargs": "^6.5.0"
   }
 }
