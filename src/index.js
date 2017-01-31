@@ -54,9 +54,6 @@ export default (cmd, args, options = {}) => {
     let stdout = null
     let stderr = null
     const [ignoreStdout, ignoreStderr] = parseStdioOption(options.stdio)
-    if (encoding) {
-      childProcess.stdin.setEncoding(encoding)
-    }
     if (!ignoreStdout) {
       stdout = []
       if (encoding) {
