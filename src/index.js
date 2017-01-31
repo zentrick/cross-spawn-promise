@@ -2,21 +2,6 @@
 
 import crossSpawn from 'cross-spawn'
 
-const shouldIgnore = (value) => (value === 'ignore' || value === 'inherit')
-
-const parseStdioOption = (value) => {
-  let ignoreStdout = false
-  let ignoreStderr = false
-  if (shouldIgnore(value)) {
-    ignoreStdout = true
-    ignoreStderr = true
-  } else if (Array.isArray(value)) {
-    ignoreStdout = shouldIgnore(value[1])
-    ignoreStderr = shouldIgnore(value[2])
-  }
-  return [ignoreStdout, ignoreStderr]
-}
-
 const closeArgsToError = (code, signal) => {
   if (signal !== null) {
     const err = new Error(`Exited with signal ${signal}`)
@@ -53,19 +38,23 @@ export default (cmd, args, options = {}) => {
 
     let stdout = null
     let stderr = null
-    const [ignoreStdout, ignoreStderr] = parseStdioOption(options.stdio)
-    if (!ignoreStdout) {
+    if (childProcess.stdin) {
+      if (encoding && childProcess.stdin.setEncoding) {
+        childProcess.stdin.setEncoding(encoding)
+      }
+    }
+    if (childProcess.stdout) {
       stdout = []
-      if (encoding) {
+      if (encoding && childProcess.stdout.setEncoding) {
         childProcess.stdout.setEncoding(encoding)
       }
       childProcess.stdout.on('data', (data) => {
         stdout.push(data)
       })
     }
-    if (!ignoreStderr) {
+    if (childProcess.stderr) {
       stderr = []
-      if (encoding) {
+      if (encoding && childProcess.stderr.setEncoding) {
         childProcess.stderr.setEncoding(encoding)
       }
       childProcess.stderr.on('data', (data) => {
@@ -75,15 +64,15 @@ export default (cmd, args, options = {}) => {
     childProcess.once('exit', (code, signal) => {
       const error = closeArgsToError(code, signal)
       if (error !== null) {
-        if (!ignoreStdout) {
+        if (stdout) {
           error.stdout = concatBuffer(stdout)
         }
-        if (!ignoreStderr) {
+        if (stderr) {
           error.stderr = concatBuffer(stderr)
         }
         reject(error)
       } else {
-        resolve(ignoreStdout ? null : concatBuffer(stdout))
+        resolve(stdout && concatBuffer(stdout))
       }
     })
     childProcess.once('error', reject)
