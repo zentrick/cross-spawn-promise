@@ -17,7 +17,7 @@ const closeArgsToError = (code, signal) => {
 }
 
 const concatBuffer = (buffer) => {
-  if (buffer.length === 0) {
+  if (buffer == null || buffer.length === 0) {
     return null
   } else if (typeof buffer[0] === 'string') {
     return buffer.join('')
@@ -28,53 +28,51 @@ const concatBuffer = (buffer) => {
   }
 }
 
+const setEncoding = (stream, encoding) => {
+  if (stream != null && encoding != null && typeof stream.setEncoding === 'function') {
+    stream.setEncoding(encoding)
+  }
+}
+
+const prepareStream = (stream, encoding) => {
+  if (stream == null) {
+    return null
+  }
+  setEncoding(stream, encoding)
+  const buffers = []
+  stream.on('data', (data) => {
+    buffers.push(data)
+  })
+  return buffers
+}
+
 export default (cmd, args, options = {}) => {
   let childProcess
   const promise = new Promise((resolve, reject) => {
-    const encoding = options.encoding
-    delete options.encoding
+    let encoding
+    if (options.encoding != null) {
+      encoding = options.encoding
+      options = Object.assign({}, options)
+      delete options.encoding
+    }
 
     childProcess = crossSpawn(cmd, args, options)
 
-    let stdout = null
-    let stderr = null
-    if (childProcess.stdin) {
-      if (encoding && childProcess.stdin.setEncoding) {
-        childProcess.stdin.setEncoding(encoding)
-      }
-    }
-    if (childProcess.stdout) {
-      stdout = []
-      if (encoding && childProcess.stdout.setEncoding) {
-        childProcess.stdout.setEncoding(encoding)
-      }
-      childProcess.stdout.on('data', (data) => {
-        stdout.push(data)
-      })
-    }
-    if (childProcess.stderr) {
-      stderr = []
-      if (encoding && childProcess.stderr.setEncoding) {
-        childProcess.stderr.setEncoding(encoding)
-      }
-      childProcess.stderr.on('data', (data) => {
-        stderr.push(data)
-      })
-    }
+    setEncoding(childProcess.stdin, encoding)
+    const stdout = prepareStream(childProcess.stdout, encoding)
+    const stderr = prepareStream(childProcess.stderr, encoding)
+
     childProcess.once('exit', (code, signal) => {
       const error = closeArgsToError(code, signal)
-      if (error !== null) {
-        if (stdout) {
-          error.stdout = concatBuffer(stdout)
-        }
-        if (stderr) {
-          error.stderr = concatBuffer(stderr)
-        }
+      if (error != null) {
+        error.stdout = concatBuffer(stdout)
+        error.stderr = concatBuffer(stderr)
         reject(error)
       } else {
-        resolve(stdout && concatBuffer(stdout))
+        resolve(concatBuffer(stdout))
       }
     })
+
     childProcess.once('error', reject)
   })
   promise.childProcess = childProcess
