@@ -2,21 +2,6 @@
 
 import crossSpawn from 'cross-spawn'
 
-const shouldIgnore = (value) => (value === 'ignore' || value === 'inherit')
-
-const parseStdioOption = (value) => {
-  let ignoreStdout = false
-  let ignoreStderr = false
-  if (shouldIgnore(value)) {
-    ignoreStdout = true
-    ignoreStderr = true
-  } else if (Array.isArray(value)) {
-    ignoreStdout = shouldIgnore(value[1])
-    ignoreStderr = shouldIgnore(value[2])
-  }
-  return [ignoreStdout, ignoreStderr]
-}
-
 const closeArgsToError = (code, signal) => {
   if (signal !== null) {
     const err = new Error(`Exited with signal ${signal}`)
@@ -32,7 +17,7 @@ const closeArgsToError = (code, signal) => {
 }
 
 const concatBuffer = (buffer) => {
-  if (buffer.length === 0) {
+  if (buffer == null || buffer.length === 0) {
     return null
   } else if (typeof buffer[0] === 'string') {
     return buffer.join('')
@@ -43,52 +28,51 @@ const concatBuffer = (buffer) => {
   }
 }
 
+const setEncoding = (stream, encoding) => {
+  if (stream != null && encoding != null && typeof stream.setEncoding === 'function') {
+    stream.setEncoding(encoding)
+  }
+}
+
+const prepareStream = (stream, encoding) => {
+  if (stream == null) {
+    return null
+  }
+  setEncoding(stream, encoding)
+  const buffers = []
+  stream.on('data', (data) => {
+    buffers.push(data)
+  })
+  return buffers
+}
+
 export default (cmd, args, options = {}) => {
   let childProcess
   const promise = new Promise((resolve, reject) => {
-    const encoding = options.encoding
-    delete options.encoding
+    let encoding
+    if (options.encoding != null) {
+      encoding = options.encoding
+      options = Object.assign({}, options)
+      delete options.encoding
+    }
 
     childProcess = crossSpawn(cmd, args, options)
 
-    let stdout = null
-    let stderr = null
-    const [ignoreStdout, ignoreStderr] = parseStdioOption(options.stdio)
-    if (encoding) {
-      childProcess.stdin.setEncoding(encoding)
-    }
-    if (!ignoreStdout) {
-      stdout = []
-      if (encoding) {
-        childProcess.stdout.setEncoding(encoding)
-      }
-      childProcess.stdout.on('data', (data) => {
-        stdout.push(data)
-      })
-    }
-    if (!ignoreStderr) {
-      stderr = []
-      if (encoding) {
-        childProcess.stderr.setEncoding(encoding)
-      }
-      childProcess.stderr.on('data', (data) => {
-        stderr.push(data)
-      })
-    }
+    setEncoding(childProcess.stdin, encoding)
+    const stdout = prepareStream(childProcess.stdout, encoding)
+    const stderr = prepareStream(childProcess.stderr, encoding)
+
     childProcess.once('exit', (code, signal) => {
       const error = closeArgsToError(code, signal)
-      if (error !== null) {
-        if (!ignoreStdout) {
-          error.stdout = concatBuffer(stdout)
-        }
-        if (!ignoreStderr) {
-          error.stderr = concatBuffer(stderr)
-        }
+      if (error != null) {
+        error.stdout = concatBuffer(stdout)
+        error.stderr = concatBuffer(stderr)
         reject(error)
       } else {
-        resolve(ignoreStdout ? null : concatBuffer(stdout))
+        resolve(concatBuffer(stdout))
       }
     })
+
     childProcess.once('error', reject)
   })
   promise.childProcess = childProcess
