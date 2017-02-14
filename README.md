@@ -24,6 +24,35 @@ spawn(command, args, options)
   })
 ```
 
+## API
+
+```js
+async spawn(command[, args][, options])
+```
+
+The returned `Promise` will resolve to the process's standard output. Depending
+on the value of the `encoding` option (see below), it will either be a
+[`Buffer`](https://nodejs.org/api/buffer.html) or a string.
+
+The promise also exposes the created child process via its `childProcess`
+property.
+
+Upon rejection, the following properties provide additional information on the
+`Error` object:
+
+- `exitSignal`
+- `exitStatus`
+- `stdout`
+- `stderr`
+
+## Options
+
+All options are passed on to
+[cross-spawn](https://www.npmjs.com/package/cross-spawn), with the exception of
+the additional `encoding` option. If you pass a string (e.g., `'utf8'`), it will
+be used as the
+[default character encoding](https://nodejs.org/api/stream.html#stream_readable_setencoding_encoding).
+
 ## Maintainer
 
 [Tim De Pauw](https://github.com/timdp)
