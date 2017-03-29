@@ -24,11 +24,11 @@
   "repository": "zentrick/cross-spawn-promise",
   "bugs": "https://github.com/zentrick/cross-spawn-promise/issues",
   "dependencies": {
-    "cross-spawn": "^5.0.1"
+    "cross-spawn": "^5.1.0"
   },
   "devDependencies": {
-    "babel-preset-env": "^1.1.8",
-    "babel-register": "^6.22.0",
+    "babel-preset-env": "^1.2.2",
+    "babel-register": "^6.24.0",
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
     "del": "^2.2.2",
@@ -37,15 +37,20 @@
     "gulp-coveralls": "^0.1.4",
     "gulp-if": "^2.0.2",
     "gulp-istanbul": "^1.1.1",
-    "gulp-load-plugins": "^1.4.0",
+    "gulp-load-plugins": "^1.5.0",
     "gulp-mocha": "^3.0.1",
-    "gulp-sourcemaps": "^2.4.0",
-    "gulp-standard": "^8.0.3",
+    "gulp-sourcemaps": "^2.5.0",
+    "gulp-standard": "^9.0.0",
     "in-publish": "^2.0.0",
     "isparta": "^4.0.0",
     "mocha-junit-reporter": "^1.13.0",
     "run-sequence": "^1.2.2",
-    "standard": "^8.6.0",
-    "yargs": "^6.6.0"
+    "standard": "^9.0.2",
+    "yargs": "^7.0.2"
+  },
+  "greenkeeper": {
+    "ignore": [
+      "gulp-mocha"
+    ]
   }
 }
