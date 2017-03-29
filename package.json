@@ -13,7 +13,8 @@
   "license": "MIT",
   "files": [
     "lib/",
-    "index.js"
+    "index.js",
+    "index.d.ts"
   ],
   "scripts": {
     "clean": "gulp clean",
