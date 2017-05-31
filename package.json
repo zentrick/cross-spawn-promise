@@ -30,7 +30,7 @@
   "devDependencies": {
     "babel-preset-env": "^1.2.2",
     "babel-register": "^6.24.0",
-    "chai": "^3.5.0",
+    "chai": "^4.0.1",
     "chai-as-promised": "^6.0.0",
     "del": "^2.2.2",
     "gulp": "^3.9.1",
