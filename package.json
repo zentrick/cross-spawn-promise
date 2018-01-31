@@ -25,7 +25,7 @@
   "repository": "zentrick/cross-spawn-promise",
   "bugs": "https://github.com/zentrick/cross-spawn-promise/issues",
   "dependencies": {
-    "cross-spawn": "^5.1.0"
+    "cross-spawn": "^6.0.4"
   },
   "devDependencies": {
     "babel-preset-env": "^1.2.2",
