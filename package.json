@@ -44,7 +44,7 @@
     "gulp-standard": "^9.0.0",
     "in-publish": "^2.0.0",
     "isparta": "^4.0.0",
-    "mocha-junit-reporter": "^1.13.0",
+    "mocha-junit-reporter": "^1.18.0",
     "run-sequence": "^1.2.2",
     "standard": "^9.0.2",
     "yargs": "^7.0.2"
