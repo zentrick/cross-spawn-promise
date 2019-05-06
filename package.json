@@ -33,7 +33,7 @@
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
     "del": "^2.2.2",
-    "gulp": "^3.9.1",
+    "gulp": "^4.0.2",
     "gulp-babel": "^6.1.2",
     "gulp-coveralls": "^0.1.4",
     "gulp-if": "^2.0.2",
