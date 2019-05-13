@@ -47,7 +47,7 @@
     "mocha-junit-reporter": "^1.13.0",
     "run-sequence": "^1.2.2",
     "standard": "^9.0.2",
-    "yargs": "^7.0.2"
+    "yargs": "^13.2.4"
   },
   "greenkeeper": {
     "ignore": [
