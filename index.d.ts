@@ -6,13 +6,16 @@
  * @param {Partial<crossSpawnPromise.CrossSpawnOptions>} [options] additional options.
  * @returns {Promise<Uint8Array>} a promise result with `stdout`
  */
+
+/// <reference types="node" />
+
 declare function crossSpawnPromise(cmd: string, args?: any[], options?: Partial<crossSpawnPromise.CrossSpawnOptions>): Promise<Uint8Array>;
 
-declare namespace crossSpawnPromise {
+import * as child_process from 'child_process';
 
-	interface CrossSpawnOptions {
+declare namespace crossSpawnPromise {
+	interface CrossSpawnOptions extends child_process.SpawnOptions {
 		encoding: string;
-		stdio: string;
 	}
 
 	interface CrossSpawnError {
